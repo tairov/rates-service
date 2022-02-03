@@ -28,3 +28,10 @@ def test_get_rate_unknown_currency():
         assert 'error_msg' in response.json
         assert response.json['error_msg'] == 'invalid_request'
         assert response.status_code == 200
+
+
+def test_metrics_success():
+    with app.test_client() as test_client:
+        response = test_client.get(f'/metrics')
+        assert b'requests_total' in response.data
+        assert response.status_code == 200
