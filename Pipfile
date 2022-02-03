@@ -12,6 +12,7 @@ python-dotenv = "*"
 prometheus-client = "*"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.9"
