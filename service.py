@@ -2,46 +2,36 @@
 webservice for REST API
 """
 
-from flask import Flask, abort, Response
+from flask import Flask
 from flask_httpauth import HTTPBasicAuth
 from flask import jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from dataprovider import DataProvider
 from dotenv import dotenv_values
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from prometheus_client import make_wsgi_app, Counter
+from prometheus_client import make_wsgi_app
+from metrics import stats
 import logging
 
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
+    return app
+
+app = create_app()
+
 auth = HTTPBasicAuth()
 
-users = {
-    "john": generate_password_hash("hello"),
-}
+config = dotenv_values('.env')
 
-config = dotenv_values(".env")
+users = {
+    config['auth_login']: generate_password_hash(config['auth_password']),
+}
 
 DEBUG_MODE = config['ENVIRONMENT'] == 'dev'
 
 format = '[%(asctime)s] %(levelname)s %(message)s'
 logging.basicConfig(format=format, level=logging.INFO,
                     datefmt="%H:%M:%S")
-
-
-class Metrics:
-    def __init__(self):
-        self.counters = {
-            'requests': Counter('requests', 'Requests count'),
-            'exceptions': Counter('exceptions', 'Exceptions count'),
-            'errors': Counter('errors', 'Errors count')
-        }
-
-    def inc(self, counter):
-        if counter not in self.counters:
-            return
-        self.counters[counter].inc()
-
-stats = Metrics()
 
 @auth.verify_password
 def verify_password(username, password):
