@@ -8,6 +8,3 @@ COPY src/ /tmp/myapp
 COPY .env /tmp/myapp/
 ENV FLASK_APP=service
 CMD cd /tmp/myapp/ && flask run --host $LISTEN_HOST --port $LISTEN_PORT
-
-#
-# docker run --name xyz --rm -i -t rates-app:1.0 bash
