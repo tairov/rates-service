@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 export FLASK_APP=./src/service.py
 export FLASK_ENV=development
 export LISTEN_HOST=0.0.0.0
