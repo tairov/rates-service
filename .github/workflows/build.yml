@@ -35,6 +35,12 @@ jobs:
           pip install pipenv
           pipenv install --dev
 
+      # return zero exit code, just to collect recommendations from linters
+      - name: Run pylint & flake8
+        run: |
+          pipenv run pylint --output-format=parseable --reports=no src/ --exit-zero
+          pipenv run flake8 --exit-zero src/ tests
+
       - name: Run unit tests
         run: |
           pipenv run scripts/run_tests.sh
