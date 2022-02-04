@@ -11,11 +11,14 @@ from dotenv import dotenv_values
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app
 from metrics import stats
+import os
 import logging
+
 
 def create_app():
     app = Flask(__name__)
     return app
+
 
 app = create_app()
 
@@ -27,11 +30,15 @@ users = {
     config['auth_login']: generate_password_hash(config['auth_password']),
 }
 
-DEBUG_MODE = config['ENVIRONMENT'] == 'dev'
+# default environment is `dev`
+ENVIRONMENT = os.getenv('FLASK_ENV', 'development')
+
+DEBUG_MODE = ENVIRONMENT == 'development'
 
 format = '[%(asctime)s] %(levelname)s %(message)s'
 logging.basicConfig(format=format, level=logging.INFO,
                     datefmt="%H:%M:%S")
+
 
 @auth.verify_password
 def verify_password(username, password):
@@ -71,5 +78,3 @@ app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
     '/metrics': make_wsgi_app()
 })
 
-if __name__ == '__main__':
-    app.run(debug=DEBUG_MODE)

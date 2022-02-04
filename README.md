@@ -12,3 +12,6 @@ http authentication required to access endpoints login/password could be provide
 `/health` - returns JSON status of the service
 
 `/metrics` - returns metrics in plain text format supported by Prometheus
+
+### Production usage
+for simplicity I don't use WSGI server like `waitress` for production it's better to execute flask application through `waitress-serve`
