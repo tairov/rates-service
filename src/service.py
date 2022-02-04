@@ -62,7 +62,7 @@ def get_rate(currency):
 
     if result.get('error'):
         stats.inc('errors')
-        return jsonify({'error_msg': result['error']})
+        return result
 
     response = jsonify({'base': result['data']['base'], 'currency': currency, 'rate': result['data']['amount']})
     return response

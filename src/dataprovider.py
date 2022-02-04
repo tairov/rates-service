@@ -1,6 +1,8 @@
 """
 Class for providing data for webservice
 """
+from json import JSONDecodeError
+
 import requests
 from retry import retry
 
@@ -15,10 +17,13 @@ class DataProvider:
 
     def get_rate(self, currency):
         result = self.get_url(self.base_url.format(currency=currency))
-        result = result.json()
+        try:
+            result = result.json()
+        except (ValueError, JSONDecodeError) as ex:
+            return {'error': 'value_error', 'error_msg': 'json decode error'}
 
         if result.get('errors', None) is not None:
-            return {'error': result['errors'][0]['id']}
+            return {'error': result['errors'][0]['id'], 'error_msg': result['errors'][0]['message']}
 
         return result
 
