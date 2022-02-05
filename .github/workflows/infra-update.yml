@@ -17,12 +17,41 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
+  notify:
+    name: Notify on Slack
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [terraform]
+    steps:
+      - name: Post to a Slack channel
+        id: slack
+        uses: slackapi/slack-github-action@v1.18.0
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "GitHub Action build result: ${{ needs.terraform.outputs.job-status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "GitHub Action build result: ${{ needs.terraform.outputs.job-status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
   terraform:
     name: "Terraform"
     defaults:
       run:
         working-directory: deploy/terraform/
     runs-on: ubuntu-latest
+    outputs:
+      job-status: ${{ job.status }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
