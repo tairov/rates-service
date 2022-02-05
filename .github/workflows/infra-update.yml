@@ -63,12 +63,6 @@ jobs:
             \`\`\`
             </details>
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-#            github.issues.create({
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              title: "Show Plan",
-#              body: output
-#            });
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
