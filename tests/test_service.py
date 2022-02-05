@@ -60,3 +60,4 @@ def test_get_rate_corrupted_response(mock_get):
         response = test_client.get(f'/rate/{AVAILABLE_CURRENCY}', headers=headers)
         assert 'error_msg' in response.json
         assert response.json['error_msg'] == 'json decode error'
+        assert False
