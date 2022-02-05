@@ -19,6 +19,13 @@ resource "aws_iam_role" "iam_role_01" {
         "Service": "eks.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      }
+      "Action": "sts:AssumeRole"
     }
   ]
 }
@@ -27,18 +34,18 @@ POLICY
 
 resource "aws_iam_role_policy_attachment" "role_01_eks_cluster_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.iam_role_01.name
+  role = aws_iam_role.iam_role_01.name
 }
 
 # Reference: https://docs.aws.amazon.com/eks/latest/userguide/security-groups-for-pods.html
 resource "aws_iam_role_policy_attachment" "role_01_eks_pods_resource_controller" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
-  role       = aws_iam_role.iam_role_01.name
+  role = aws_iam_role.iam_role_01.name
 }
 
 
 resource "aws_eks_cluster" "eks_01" {
-  name     = "eks-01-${var.env}"
+  name = "eks-01-${var.env}"
   role_arn = aws_iam_role.iam_role_01.arn
 
   vpc_config {
@@ -59,30 +66,33 @@ resource "aws_eks_cluster" "eks_01" {
 
 resource "aws_iam_role_policy_attachment" "role_01_eks_worker_node_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.iam_role_01.name
+  role = aws_iam_role.iam_role_01.name
 }
 
 resource "aws_iam_role_policy_attachment" "role_01_eks_cni_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.iam_role_01.name
+  role = aws_iam_role.iam_role_01.name
 }
 
 resource "aws_iam_role_policy_attachment" "role_01_eks_ec2_container_registry_readonly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.iam_role_01.name
+  role = aws_iam_role.iam_role_01.name
 }
 
 resource "aws_eks_node_group" "eks_01_node_group_01" {
-  cluster_name    = aws_eks_cluster.eks_01.name
+  cluster_name = aws_eks_cluster.eks_01.name
   node_group_name = "eks_01_node_group_${var.env}"
-  node_role_arn   = aws_iam_role.iam_role_01.arn
-  subnet_ids      = var.subnet_ids
-  instance_types  = ["t2.micro", "t3.micro", "t3a.micro"]
+  node_role_arn = aws_iam_role.iam_role_01.arn
+  subnet_ids = var.subnet_ids
+  instance_types = [
+    "t2.micro",
+    "t3.micro",
+    "t3a.micro"]
 
   scaling_config {
     desired_size = 1
-    max_size     = 1
-    min_size     = 1
+    max_size = 1
+    min_size = 1
   }
 
   update_config {
