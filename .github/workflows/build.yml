@@ -9,15 +9,10 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-push-image:
+  notify:
+    name: Notify on Slack
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [ 3.9 ]
-    permissions:
-      contents: read
-      packages: write
-
+    needs: [build-and-push-image]
     steps:
       - name: Report Status
         uses: ravsamhq/notify-slack-action@v1
@@ -30,6 +25,16 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
 
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.9 ]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
