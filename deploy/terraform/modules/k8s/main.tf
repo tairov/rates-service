@@ -24,7 +24,7 @@ resource "aws_iam_role" "iam_role_01" {
       "Effect": "Allow",
       "Principal": {
         "Service": "ec2.amazonaws.com"
-      }
+      },
       "Action": "sts:AssumeRole"
     }
   ]

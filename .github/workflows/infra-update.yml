@@ -1,5 +1,6 @@
 name: Check terraform plan & approve change in infra resources
 
+# report TF plan when pull_request received & apply changes after PR is merged
 on:
   push:
     branches:
