@@ -27,3 +27,13 @@ resource "aws_subnet" "subnet_02" {
     Name = "subnet-02-${var.env}"
   }
 }
+
+output "vpc_01_id" {
+  value = aws_vpc.vpc_01.id
+}
+output "subnet_01_id" {
+  value = aws_subnet.subnet_01.id
+}
+output "subnet_02_id" {
+  value = aws_subnet.subnet_02.id
+}
