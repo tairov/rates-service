@@ -1,5 +1,5 @@
 
 module "vpc" {
-  source  = "./modules/vpc/"
-  env = var.env
+  source = "./modules/vpc/"
+  env    = var.env
 }
