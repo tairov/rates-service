@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'deploy/**'
   pull_request:
 
 env:
