@@ -25,6 +25,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
 
+
   build-and-push-image:
     runs-on: ubuntu-latest
     strategy:
