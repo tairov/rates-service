@@ -19,6 +19,17 @@ jobs:
       packages: write
 
     steps:
+      - name: Report Status
+        uses: ravsamhq/notify-slack-action@v1
+        if: always()
+        with:
+          status: ${{ job.status }}
+          # mention tairov
+          mention_users: 'U1C8D34HL'
+          mention_users_when: 'failure,warnings'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
