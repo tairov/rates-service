@@ -41,13 +41,13 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        # if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         run: terraform plan -no-color
         continue-on-error: true
 
       - name: Comment terraform plan
         uses: actions/github-script@0.9.0
-        #if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
@@ -63,18 +63,18 @@ jobs:
             \`\`\`
             </details>
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-            github.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: "Show Plan",
-              body: output
-            });
-#            github.issues.createComment({
-#              issue_number: context.issue.number,
+#            github.issues.create({
 #              owner: context.repo.owner,
 #              repo: context.repo.repo,
+#              title: "Show Plan",
 #              body: output
-#            })
+#            });
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
