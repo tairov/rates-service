@@ -39,9 +39,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-
   build-and-push-image:
-    needs: [terraform-plan]
     runs-on: ubuntu-latest
     strategy:
       matrix:
