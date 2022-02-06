@@ -2,6 +2,10 @@ variable "env" {
   default = ""
 }
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 resource "aws_vpc" "vpc_01" {
   cidr_block = "10.0.0.0/16"
 
@@ -11,20 +15,27 @@ resource "aws_vpc" "vpc_01" {
 }
 
 resource "aws_subnet" "subnet_01" {
-  vpc_id = aws_vpc.vpc_01.id
-  cidr_block = "10.0.1.0/24"
+  availability_zone = data.aws_availability_zones.available.names[0]
+
+  vpc_id                  = aws_vpc.vpc_01.id
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = true
 
   tags = {
-    Name = "subnet-01-${var.env}"
+    Name                            = "subnet-01-${var.env}"
+    "kubernetes.io/cluster/eks-dev" = "shared"
   }
 }
 
 resource "aws_subnet" "subnet_02" {
-  vpc_id = aws_vpc.vpc_01.id
-  cidr_block = "10.0.2.0/24"
+  availability_zone       = data.aws_availability_zones.available.names[1]
+  vpc_id                  = aws_vpc.vpc_01.id
+  cidr_block              = "10.0.2.0/24"
+  map_public_ip_on_launch = true
 
   tags = {
-    Name = "subnet-02-${var.env}"
+    Name                            = "subnet-02-${var.env}"
+    "kubernetes.io/cluster/eks-dev" = "shared"
   }
 }
 
@@ -48,21 +59,7 @@ resource "aws_eip" "eip_01" {
   vpc = true
 
   depends_on = [
-    aws_internet_gateway.internet_gw_01]
-}
-
-resource "aws_nat_gateway" "natgw_01" {
-  allocation_id = aws_eip.eip_01.id
-  subnet_id = aws_subnet.subnet_01.id
-
-  tags = {
-    Name = "vpc_01_natgw_01_${var.env}"
-  }
-
-  # To ensure proper ordering, it is recommended to add an explicit dependency
-  # on the Internet Gateway for the VPC.
-  depends_on = [
-    aws_internet_gateway.internet_gw_01]
+  aws_internet_gateway.internet_gw_01]
 }
 
 resource "aws_route_table" "route_table_01" {
@@ -70,7 +67,7 @@ resource "aws_route_table" "route_table_01" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.natgw_01.id
+    gateway_id = aws_internet_gateway.internet_gw_01.id
   }
 
   tags = {

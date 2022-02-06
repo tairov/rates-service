@@ -12,6 +12,10 @@ terraform {
   required_version = ">= 1.1.5"
 }
 
+variable "aws_region" {
+  default = ""
+}
+
 provider "aws" {
-  region = "eu-central-1"
+  region = var.aws_region
 }

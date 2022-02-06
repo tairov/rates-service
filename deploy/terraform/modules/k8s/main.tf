@@ -6,6 +6,12 @@ variable "subnet_ids" {
   type = list(string)
 }
 
+variable "nodes_keypair" {
+  default = ""
+}
+variable "vpc_id" {
+  default = ""
+}
 resource "aws_iam_role" "iam_role_01" {
   name = "iam-role-01-${var.env}"
 
@@ -44,11 +50,36 @@ resource "aws_iam_role_policy_attachment" "role_01_eks_pods_resource_controller"
 }
 
 
+resource "aws_security_group" "sg_eks_cluster" {
+  name        = "security-group-eks-cluster-${var.env}"
+  vpc_id      = var.vpc_id
+
+  # Egress allows Outbound traffic from the EKS cluster to the  Internet
+
+  egress {                   # Outbound Rule
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  # Ingress allows Inbound traffic to EKS cluster from the  Internet
+
+  ingress {                  # Inbound Rule
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+}
+
 resource "aws_eks_cluster" "eks_01" {
   name = "eks-${var.env}"
   role_arn = aws_iam_role.iam_role_01.arn
+  version = "1.19"
 
   vpc_config {
+    security_group_ids = [ aws_security_group.sg_eks_cluster.id ]
     subnet_ids = var.subnet_ids
     endpoint_private_access = true
   }
@@ -80,20 +111,19 @@ resource "aws_iam_role_policy_attachment" "role_01_eks_ec2_container_registry_re
   role = aws_iam_role.iam_role_01.name
 }
 
+
 resource "aws_eks_node_group" "eks_01_node_group_01" {
   cluster_name = aws_eks_cluster.eks_01.name
   node_group_name = "eks_01_node_group_${var.env}"
   node_role_arn = aws_iam_role.iam_role_01.arn
-  subnet_ids = [var.subnet_ids[0]]
+  subnet_ids = [
+    var.subnet_ids[0]]
 
-  instance_types = [
-    "t2.micro",
-    "t3.micro",
-    "t3a.micro"]
+  instance_types = ["t3.small", "t3.medium"]
 
   scaling_config {
-    desired_size = 1
-    max_size = 1
+    desired_size = 2
+    max_size = 2
     min_size = 1
   }
 
@@ -102,7 +132,7 @@ resource "aws_eks_node_group" "eks_01_node_group_01" {
   }
 
   remote_access {
-    ec2_ssh_key = "test-euc"
+    ec2_ssh_key = var.nodes_keypair
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
