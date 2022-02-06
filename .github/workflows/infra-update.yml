@@ -103,9 +103,14 @@ jobs:
               repo: context.repo.repo,
               body: output
             });
+
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
+
+      - name: Terraform Change Workspace
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        run: terraform workspace select eu-central-1
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
