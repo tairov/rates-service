@@ -33,17 +33,24 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: LISTEN_PORT
+              value: "{{ .Values.env.LISTEN_PORT }}"
+            - name: LISTEN_HOST
+              value: "{{ .Values.env.LISTEN_HOST }}"
+            - name: FLASK_ENV
+              value: "{{ .Values.env.FLASK_ENV }}"
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

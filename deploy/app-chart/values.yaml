@@ -5,10 +5,15 @@
 replicaCount: 1
 
 image:
-  repository: nginx
+  repository: ghcr.io/tairov/rates-service
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "master"
+
+env:
+  FLASK_ENV: development
+  LISTEN_HOST: 0.0.0.0
+  LISTEN_PORT: 80
 
 imagePullSecrets: []
 nameOverride: ""
