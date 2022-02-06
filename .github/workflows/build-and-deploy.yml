@@ -12,7 +12,7 @@ env:
   AWS_DEFAULT_REGION: eu-central-1
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  K8S_CLUSTER_NAME: euc-dev
+  K8S_CLUSTER_NAME: eks-euc-dev
   KUBECONFIG: "/tmp/eks-config-euc-dev.json"
 
 jobs:
