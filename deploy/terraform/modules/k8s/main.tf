@@ -85,6 +85,7 @@ resource "aws_eks_node_group" "eks_01_node_group_01" {
   node_group_name = "eks_01_node_group_${var.env}"
   node_role_arn = aws_iam_role.iam_role_01.arn
   subnet_ids = [var.subnet_ids[0]]
+
   instance_types = [
     "t2.micro",
     "t3.micro",
@@ -98,6 +99,10 @@ resource "aws_eks_node_group" "eks_01_node_group_01" {
 
   update_config {
     max_unavailable = 1
+  }
+
+  remote_access {
+    ec2_ssh_key = "test-euc"
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
