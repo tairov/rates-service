@@ -122,10 +122,6 @@ jobs:
           namespace: 'default'
           chart: 'deploy/app-chart'
           token: '${{ github.token }}'
-          value-files: >-
-          [
-              "values.yaml"
-          ]
         env:
           KUBECONFIG_FILE: '${{ env.KUBECONFIG }}'
 
