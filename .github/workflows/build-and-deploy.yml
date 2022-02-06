@@ -122,4 +122,4 @@ jobs:
       - name: Deploy app
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: |
-          helm upgrade --install rates-service deploy/app-chart
+          helm upgrade --install rates-service deploy/helm/app-chart
