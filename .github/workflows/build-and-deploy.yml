@@ -9,6 +9,11 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  AWS_DEFAULT_REGION: eu-central-1
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  K8S_CLUSTER_NAME: euc-dev
+  KUBECONFIG: "/tmp/eks-config-euc-dev.json"
 
 jobs:
   notify:
@@ -97,4 +102,30 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Configure AWS Credentials
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Export kubeconfig from eks
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        run: |
+          aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name ${K8S_CLUSTER_NAME} --kubeconfig /tmp/eks-config-${K8S_CLUSTER_NAME}.json
+
+      - name: Deploy app
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        uses: 'deliverybot/helm@v1'
+        with:
+          release: 'rates-service'
+          namespace: 'default'
+          chart: 'deploy/app-chart'
+          token: '${{ github.token }}'
+          value-files: >-
+          [
+              "values.yaml",
+          ]
+        env:
+          KUBECONFIG_FILE: '${{ env.KUBECONFIG }}'
 
