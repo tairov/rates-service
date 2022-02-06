@@ -70,6 +70,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install pipenv
           pipenv install --dev
+          wget https://get.helm.sh/helm-v3.4.1-linux-amd64.tar.gz
+          tar xvf helm-v3.4.1-linux-amd64.tar.gz
+          mv linux-amd64/helm /usr/local/bin
+          rm -rf helm-v3.4.1-linux-amd64.tar.gz linux-amd64/
 
       # return zero exit code, just to collect recommendations from linters
       - name: Run pylint & flake8
@@ -116,12 +120,5 @@ jobs:
 
       - name: Deploy app
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        uses: 'deliverybot/helm@v1'
-        with:
-          release: 'rates-service'
-          namespace: 'default'
-          chart: 'deploy/app-chart'
-          token: '${{ github.token }}'
-        env:
-          KUBECONFIG_FILE: '${{ env.KUBECONFIG }}'
-
+        run: |
+          helm upgrade --install rates-service deploy/app-chart
