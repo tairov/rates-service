@@ -40,23 +40,23 @@ POLICY
 
 resource "aws_iam_role_policy_attachment" "role_01_eks_cluster_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role = aws_iam_role.iam_role_01.name
+  role       = aws_iam_role.iam_role_01.name
 }
 
 # Reference: https://docs.aws.amazon.com/eks/latest/userguide/security-groups-for-pods.html
 resource "aws_iam_role_policy_attachment" "role_01_eks_pods_resource_controller" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
-  role = aws_iam_role.iam_role_01.name
+  role       = aws_iam_role.iam_role_01.name
 }
 
 
 resource "aws_security_group" "sg_eks_cluster" {
-  name        = "security-group-eks-cluster-${var.env}"
-  vpc_id      = var.vpc_id
+  name   = "security-group-eks-cluster-${var.env}"
+  vpc_id = var.vpc_id
 
   # Egress allows Outbound traffic from the EKS cluster to the  Internet
 
-  egress {                   # Outbound Rule
+  egress { # Outbound Rule
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -64,7 +64,7 @@ resource "aws_security_group" "sg_eks_cluster" {
   }
   # Ingress allows Inbound traffic to EKS cluster from the  Internet
 
-  ingress {                  # Inbound Rule
+  ingress { # Inbound Rule
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -74,13 +74,13 @@ resource "aws_security_group" "sg_eks_cluster" {
 }
 
 resource "aws_eks_cluster" "eks_01" {
-  name = "eks-${var.env}"
+  name     = "eks-${var.env}"
   role_arn = aws_iam_role.iam_role_01.arn
-  version = "1.19"
+  version  = "1.19"
 
   vpc_config {
-    security_group_ids = [ aws_security_group.sg_eks_cluster.id ]
-    subnet_ids = var.subnet_ids
+    security_group_ids      = [aws_security_group.sg_eks_cluster.id]
+    subnet_ids              = var.subnet_ids
     endpoint_private_access = true
   }
 
@@ -98,33 +98,33 @@ resource "aws_eks_cluster" "eks_01" {
 
 resource "aws_iam_role_policy_attachment" "role_01_eks_worker_node_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role = aws_iam_role.iam_role_01.name
+  role       = aws_iam_role.iam_role_01.name
 }
 
 resource "aws_iam_role_policy_attachment" "role_01_eks_cni_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role = aws_iam_role.iam_role_01.name
+  role       = aws_iam_role.iam_role_01.name
 }
 
 resource "aws_iam_role_policy_attachment" "role_01_eks_ec2_container_registry_readonly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role = aws_iam_role.iam_role_01.name
+  role       = aws_iam_role.iam_role_01.name
 }
 
 
 resource "aws_eks_node_group" "eks_01_node_group_01" {
-  cluster_name = aws_eks_cluster.eks_01.name
+  cluster_name    = aws_eks_cluster.eks_01.name
   node_group_name = "eks_01_node_group_${var.env}"
-  node_role_arn = aws_iam_role.iam_role_01.arn
+  node_role_arn   = aws_iam_role.iam_role_01.arn
   subnet_ids = [
-    var.subnet_ids[0]]
+  var.subnet_ids[0]]
 
   instance_types = ["t3.small", "t3.medium"]
 
   scaling_config {
     desired_size = 2
-    max_size = 2
-    min_size = 1
+    max_size     = 2
+    min_size     = 1
   }
 
   update_config {
