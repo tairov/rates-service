@@ -45,11 +45,12 @@ resource "aws_iam_role_policy_attachment" "role_01_eks_pods_resource_controller"
 
 
 resource "aws_eks_cluster" "eks_01" {
-  name = "eks-01-${var.env}"
+  name = "eks-${var.env}"
   role_arn = aws_iam_role.iam_role_01.arn
 
   vpc_config {
     subnet_ids = var.subnet_ids
+    endpoint_private_access = true
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
@@ -83,7 +84,7 @@ resource "aws_eks_node_group" "eks_01_node_group_01" {
   cluster_name = aws_eks_cluster.eks_01.name
   node_group_name = "eks_01_node_group_${var.env}"
   node_role_arn = aws_iam_role.iam_role_01.arn
-  subnet_ids = var.subnet_ids
+  subnet_ids = [var.subnet_ids[0]]
   instance_types = [
     "t2.micro",
     "t3.micro",
