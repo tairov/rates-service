@@ -76,7 +76,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -no-color -var-file environments/dev.tfvars
+        run: terraform plan -no-color -var-file environments/euc-dev.tfvars
         continue-on-error: true
 
       - name: Comment terraform plan
@@ -109,4 +109,4 @@ jobs:
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform apply -var-file environments/dev.tfvars -auto-approve
+        run: terraform apply -var-file environments/euc-dev.tfvars -auto-approve
