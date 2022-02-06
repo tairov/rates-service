@@ -70,10 +70,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install pipenv
           pipenv install --dev
-          wget https://get.helm.sh/helm-v3.4.1-linux-amd64.tar.gz
-          tar xvf helm-v3.4.1-linux-amd64.tar.gz
-          mv linux-amd64/helm /usr/local/bin
-          rm -rf helm-v3.4.1-linux-amd64.tar.gz linux-amd64/
 
       # return zero exit code, just to collect recommendations from linters
       - name: Run pylint & flake8
@@ -117,6 +113,11 @@ jobs:
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: |
           aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name ${K8S_CLUSTER_NAME} --kubeconfig /tmp/eks-config-${K8S_CLUSTER_NAME}.json
+
+      - uses: azure/setup-helm@v1
+        with:
+          version: 'latest' # default is latest stable
+        id: install
 
       - name: Deploy app
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
