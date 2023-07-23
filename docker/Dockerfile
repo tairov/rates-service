@@ -2,7 +2,7 @@
 FROM python:3.9-slim-bullseye
 RUN pip install pipenv
 COPY Pipfile* /tmp
-RUN cd /tmp && pipenv lock --keep-outdated --requirements > requirements.txt
+RUN cd /tmp && pipenv requirements > requirements.txt
 RUN pip install -r /tmp/requirements.txt
 COPY src/ /tmp/myapp
 COPY .env /tmp/myapp/
