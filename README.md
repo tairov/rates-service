@@ -1,31 +1,63 @@
-# rates-service example
-Rest API for rates retrieval
+# rates-service
 
-### Authetication
+## Rest API for BTC rates retrieval
 
-http authentication required to access endpoints login/password could be provided through `.env` file
+### Authentication
+
+HTTP authentication is required to access endpoints. The login and password can be provided through a `.env` file.
 
 ### Endpoints:
 
-`/rate/<currency>` - returns JSON response with current BTC rate for requested currency
+1. `/rate/<currency>` - Returns a JSON response with the current BTC rate for the requested currency.
 
-`/health` - returns JSON status of the service
+2. `/health` - Returns a JSON status of the service.
 
-`/metrics` - returns metrics in plain text format supported by Prometheus
+3. `/metrics` - Returns metrics in plain text format supported by Prometheus.
 
 ### Terraform setup
 
-Bucket for TF state must be created before `terraform init`
-`aws s3 mb s3://rates-service-terraform-state-bucket`
-DynamoDB table must be created to enable state lock
+Before running `terraform init`, create a bucket for TF state:
+
+```
+aws s3 mb s3://rates-service-terraform-state-bucket
+```
+
+Also, create a DynamoDB table to enable state locking:
 
 ```
 aws dynamodb create-table --table-name rates-service-terraform-state-table --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
 ```
+
 ### Infra update
 
-If PR created to update infrastructure (currenty all files under deploy/** directory) , separate github actions workflow creates a comment in PR with terraform plan. Once PR merged terraform will be executed with `apply -auto-approve` options
+If a pull request is created to update the infrastructure (currently all files under the `deploy/` directory), a separate GitHub Actions workflow will create a comment in the PR with the Terraform plan. Once the PR is merged, Terraform will be executed with the `apply -auto-approve` options.
 
 ### Production usage
-for simplicity I don't use WSGI server like `waitress` for production it's better to execute flask application through `waitress-serve`
 
+For simplicity, a WSGI server like `waitress` is not used in development. For production, it is recommended to execute the Flask application through `waitress-serve`.
+
+#### Running via Docker
+
+To run the service using Docker, execute the following command:
+
+```bash
+docker run --name rates_service -p 8085:8085 \
+  --env FLASK_ENV=development \
+  --env LISTEN_HOST=0.0.0.0 \
+  --env LISTEN_PORT=8085 \
+  ghcr.io/tairov/rates-service:master
+```
+
+After running the Docker container, you can check if the service is up and running by visiting:
+
+```bash
+curl http://localhost:8085/health
+```
+
+To retrieve a JSON response for BTC/USD, use the following command:
+
+```bash
+curl -u "john:hello" http://localhost:8085/rate/USD
+```
+
+Please note that the authentication credentials (`john:hello`) should match the ones provided in the `.env` file to access the endpoints.
