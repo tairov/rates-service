@@ -32,6 +32,10 @@ aws dynamodb create-table --table-name rates-service-terraform-state-table --att
 
 If a pull request is created to update the infrastructure (currently all files under the `deploy/` directory), a separate GitHub Actions workflow will create a comment in the PR with the Terraform plan. Once the PR is merged, Terraform will be executed with the `apply -auto-approve` options.
 
+### Package available on GitHub Container Registry
+
+https://github.com/tairov/rates-service/pkgs/container/rates-service
+
 ### Production usage
 
 For simplicity, a WSGI server like `waitress` is not used in development. For production, it is recommended to execute the Flask application through `waitress-serve`.
